@@ -8,29 +8,35 @@ import java.util.Scanner;
 public class PasswordManager {
     private static final String PASSWORD_FILE = "password.bin";
 
-    public void handlePasswordFlow() throws NoSuchAlgorithmException, IOException {
+    public void handlePasswordFlow() {
         Scanner scanner = new Scanner(System.in);
         boolean verified = false;
 
         while (!verified) {
-            System.out.println("Please enter a new password:");
-            String password = scanner.nextLine();
+            try {
+                System.out.println("Please enter a new password:");
+                String password = scanner.nextLine();
 
-            // Hashing the password with a salt
-            String[] hashedPasswordAndSalt = hashPassword(password);
+                // Hashing the password with a salt
+                String[] hashedPasswordAndSalt = hashPassword(password);
 
-            // Storing the hashed password and salt
-            storePassword(hashedPasswordAndSalt);
+                // Storing the hashed password and salt
+                storePassword(hashedPasswordAndSalt[0], hashedPasswordAndSalt[1]);
 
-            System.out.println("Please re-enter your password for verification:");
-            String verifyPassword = scanner.nextLine();
+                System.out.println("Please re-enter your password for verification:");
+                String verifyPassword = scanner.nextLine();
 
-            // Verifying the password
-            verified = verifyPassword(verifyPassword);
-            if (!verified) {
-                System.out.println("Passwords do not match. Please try again.");
-            } else {
-                System.out.println("Password verified successfully.");
+                // Verifying the password
+                verified = verifyPassword(verifyPassword);
+                if (!verified) {
+                    System.out.println("Passwords do not match. Please try again.");
+                } else {
+                    System.out.println("Password verified successfully.");
+                }
+            } catch (NoSuchAlgorithmException | IOException e) {
+                System.err.println("An error occurred during password processing: " + e.getMessage());
+                // Depending on your application's requirements, you might want to exit or give the user another chance.
+                break;
             }
         }
     }
@@ -47,10 +53,10 @@ public class PasswordManager {
         return new String[]{encodedHash, encodedSalt};
     }
 
-    private void storePassword(String[] passwordAndSalt) throws IOException {
+    private void storePassword(String hashedPassword, String salt) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(PASSWORD_FILE))) {
-            dos.writeUTF(passwordAndSalt[0]); // Write the hashed password
-            dos.writeUTF(passwordAndSalt[1]); // Write the salt
+            dos.writeUTF(hashedPassword); // Write the hashed password
+            dos.writeUTF(salt); // Write the salt
         }
     }
 
