@@ -26,26 +26,16 @@ public class InputHandler {
     }
 
     public String readValidFileName(String fileType) {
-        System.out.println("Please enter the name of the " + fileType + " file:");
-        String invalidChars = "/\\?%*:|\"<>.";
-        String fileName;
+        System.out.println("Please enter the name of the " + fileType + " file (use \".\" for file extensions):");
         while (true) {
-            fileName = scanner.next();
-            boolean isValid = true;
-            for (char c : invalidChars.toCharArray()) {
-                if (fileName.indexOf(c) != -1) {
-                    System.out.println("Invalid file name. File name cannot contain /\\?%*:|\"<>.");
-                    isValid = false;
-                    break;
-                }
-            }
-            if (isValid && !fileName.trim().isEmpty()) {
-                break;
+            String fileName = scanner.nextLine();
+            // Validate that the file name contains only valid characters and has at least one character before the dot and an extension
+            if (fileName.matches("[a-zA-Z0-9-_]+\\.?[a-zA-Z0-9-_]*") && !fileName.endsWith(".")) {
+                return fileName;
             } else {
-                System.out.println("Invalid input. Please enter a valid file name:");
+                System.out.println("Invalid file name. Please make sure the file name does not end with a dot and contains only letters, numbers, hyphens, or underscores:");
             }
         }
-        return fileName;
     }
 
     public String[] readAndVerifyPassword() {
