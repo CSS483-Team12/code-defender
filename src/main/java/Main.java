@@ -1,68 +1,44 @@
 import java.io.*;
-import java.util.Scanner;
-// Import any necessary libraries for hashing
 
 public class Main {
-
-    private static final Scanner scanner = new Scanner(System.in);
-
     public static void main(String[] args) {
-        // Assuming proper imports and error handling are implemented elsewhere
-        String firstName = promptForName("first");
-        String lastName = promptForName("last");
-        int firstInt = promptForInt();
-        int secondInt = promptForInt();
-        String inputFile = promptForFileName("input");
-        String outputFile = promptForFileName("output");
-        // Implement password handling logic here
-        // Writing to output file
-        try (PrintWriter writer = new PrintWriter(outputFile)) {
-            writer.println("First name: " + firstName);
-            writer.println("Last name: " + lastName);
-            writer.println("First Integer: " + firstInt);
-            writer.println("Second Integer: " + secondInt);
-            writer.println("Sum: " + (firstInt + secondInt));
-            writer.println("Product: " + ((long) firstInt * secondInt));
-            // Read from input file and write its contents
-            writeInputFileContents(writer, inputFile);
-        } catch (FileNotFoundException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
-            // Log to error file
+        InputHandler inputHandler = new InputHandler();
+        FileProcessor fileProcessor = new FileProcessor();
+        PasswordManager passwordManager = new PasswordManager();
+
+        try {
+            // Prompt for and read the user's first and last names
+            String firstName = inputHandler.readValidName("first name");
+            String lastName = inputHandler.readValidName("last name");
+
+            // Prompt for and read two int values
+            int firstInt = inputHandler.readValidInt();
+            int secondInt = inputHandler.readValidInt();
+
+            // Prompt for and read the names of the input and output files
+            String inputFileName = inputHandler.readValidFileName("input");
+            String outputFileName = inputHandler.readValidFileName("output");
+
+            // Prompt for and handle password input
+            String[] passwordAndSalt = inputHandler.readAndVerifyPassword();
+
+            // Read the contents of the input file
+            String inputFileContents = fileProcessor.readInputFile(inputFileName);
+
+            // Prepare content to write to the output file
+            String outputContent = String.format("First Name: %s\nLast Name: %s\nFirst Integer: %d\nSecond Integer: %d\nSum: %d\nProduct: %d\nInput File Name: %s\nInput File Contents:\n%s",
+                    firstName, lastName, firstInt, secondInt, firstInt + secondInt, firstInt * secondInt, inputFileName, inputFileContents);
+
+            // Write to the output file
+            fileProcessor.writeOutputFile(outputFileName, outputContent);
+
+            // Securely store the hashed password
+            fileProcessor.storePassword("passwords.txt", passwordAndSalt);
+
+            System.out.println("Operation completed successfully.");
+        } catch (Exception e) {
+            Logger.logError(e.getMessage());
+            System.err.println("An error occurred. Please check the error log for details.");
         }
     }
-
-    private static String promptForName(String whichName) {
-        System.out.println("Enter your " + whichName + " name (letters only, up to 50 characters): ");
-        String name = scanner.nextLine();
-        // Add validation logic
-        return name;
-    }
-
-    private static int promptForInt() {
-        System.out.println("Enter an integer value (-2,147,483,648 to 2,147,483,647): ");
-        int value = scanner.nextInt();
-        scanner.nextLine(); // Consume newline left-over
-        // Add validation logic
-        return value;
-    }
-
-    private static String promptForFileName(String whichFile) {
-        System.out.println("Enter the name of the " + whichFile + " file: ");
-        return scanner.nextLine();
-        // Add validation logic
-    }
-
-    private static void writeInputFileContents(PrintWriter writer, String inputFile) {
-        try (Scanner fileScanner = new Scanner(new File(inputFile))) {
-            writer.println("Input file contents:");
-            while (fileScanner.hasNextLine()) {
-                writer.println(fileScanner.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            System.err.println("Input file not found: " + e.getMessage());
-            // Log to error file
-        }
-    }
-
-    // I will need to implement password handling and hashing logic here
 }
