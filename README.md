@@ -4,7 +4,7 @@
 
 ### Overview
 
-- This program is created by [Nghia Le][nghiaruoi-github] and [Griffin Ryan][griffinryan-github].
+- This program is created by [Nghia Le][nghiaruoi-github] (Tony Le) and [Griffin Ryan][griffinryan-github].
 
 ---
 # TO-DO:

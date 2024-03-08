@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.Scanner;
 
 public class InputHandler {
@@ -9,17 +10,17 @@ public class InputHandler {
 
     public String readValidName(String nameType) {
         System.out.println("Please enter your " + nameType + " (at most 50 characters, letters only):");
-        while (!scanner.hasNext("[A-Za-z]{1,50}")) {
-            System.out.println("Invalid " + nameType + ". Please enter letters only, up to 50 characters:");
+        while (!scanner.hasNext("[A-Z][a-z]{0,49}")) {
+            System.out.print("Invalid " + nameType + ". Please enter letters only, up to 50 characters:");
             scanner.next(); // Consume the invalid input
         }
         return scanner.next();
     }
 
     public int readValidInt() {
-        System.out.println("Enter an integer value (range: " + Integer.MIN_VALUE + " to " + Integer.MAX_VALUE + "):");
+        System.out.print("Enter an integer value (range: " + Integer.MIN_VALUE + " to " + Integer.MAX_VALUE + "):");
         while (!scanner.hasNextInt()) {
-            System.out.println("Invalid integer. Please enter a value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE + ":");
+            System.out.print("Invalid integer. Please enter a value between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE + ":");
             scanner.next(); // Consume the invalid input
         }
         return scanner.nextInt();
@@ -27,11 +28,17 @@ public class InputHandler {
 
     public String readValidFileName(String fileType) {
         System.out.println("Please enter the name of the " + fileType + " file (use \".\" for file extensions):");
+
         while (true) {
             String fileName = scanner.nextLine();
+
             // Validate that the file name contains only valid characters and has at least one character before the dot and an extension
             if (fileName.matches("[a-zA-Z0-9-_]+\\.?[a-zA-Z0-9-_]*") && !fileName.endsWith(".")) {
-                return fileName;
+                File file = new File(fileName);
+                if (file.exists()) {
+                    return fileName;
+                }
+                System.out.print("File do not exist. Please make sure the file exists, try again: ");
             } else {
                 System.out.println("Invalid file name. Please make sure the file name does not end with a dot and contains only letters, numbers, hyphens, or underscores:");
             }
