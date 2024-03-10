@@ -1,45 +1,47 @@
+/**
+ * code-defender
+ * @author Griffin Ryan (glryan@uw.edu)
+ * @author Tony Le ()
+ **/
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
         InputHandler inputHandler = new InputHandler();
-        FileProcessor fileProcessor = new FileProcessor();
         PasswordManager passwordManager = new PasswordManager();
+        FileProcessor fileProcessor = new FileProcessor();
 
-        try {
-            // Collect user's first and last names
-            String firstName = inputHandler.readValidName("first name");
-            String lastName = inputHandler.readValidName("last name");
+        System.out.println("Welcome to the Secure App!");
 
-            // Prompt for and read the names of the input and output files
-            String inputFileName = inputHandler.readValidFileName("input");
-            String outputFileName = inputHandler.readValidFileName("output");
+        // User input collection process
+        String firstName = inputHandler.readValidName(scanner, "first name");
+        String lastName = inputHandler.readValidName(scanner, "last name");
+        int firstInt = inputHandler.readIntValue(scanner, "Enter the first integer: ");
+        int secondInt = inputHandler.readIntValue(scanner, "Enter the second integer: ");
+        String inputFileName = inputHandler.readValidFileName(scanner, "input");
+        String outputFileName = inputHandler.readValidFileName(scanner, "output");
 
-            // Reading input file contents
-            String inputFileContents = "";
-            try {
-                inputFileContents = fileProcessor.readInputFile(inputFileName);
-            } catch (Exception e) {
-                System.err.println("Failed to read from input file: " + e.getMessage());
-                // Handle error, possibly continue to password step or retry
-            }
+        // Password setup and verification
+        passwordManager.handlePasswordSetup(scanner);
 
-            // Handle the password input, hash, store, and verify at the end
-            passwordManager.handlePasswordFlow();
+        // Assuming handlePasswordSetup includes the entire process:
+        // 1. User sets a password, which is then hashed and stored with a salt.
+        // 2. User is prompted to re-enter the password for verification.
 
-            // Prompt for and read two int values
-            int firstInt = inputHandler.readValidInt();
-            int secondInt = inputHandler.readValidInt();
-
-            // Preparing content for output file
-            String outputContent = String.format("First Name: %s\nLast Name: %s\nFirst Integer: %d\nSecond Integer: %d\nSum: %d\nProduct: %d\nInput File Name: %s\nInput File Contents:\n%s",
-                    firstName, lastName, firstInt, secondInt, firstInt + secondInt, (long) firstInt * secondInt, inputFileName, inputFileContents);
-
-            // Writing to the output file
-            fileProcessor.writeOutputFile(outputFileName, outputContent);
-
-            System.out.println("Operation completed successfully.");
-        } catch (Exception e) {
-            System.err.println("An error occurred: " + e.getMessage());
-            // Depending on your application's error handling policy, you might want to log this error or take specific actions.
+        // File operations
+        if (fileProcessor.canReadFile(inputFileName)) {
+            fileProcessor.openFile(outputFileName);
+            fileProcessor.writeLine("First Name: " + firstName);
+            fileProcessor.writeLine("Last Name: " + lastName);
+            fileProcessor.writeResults(firstInt, secondInt);
+            fileProcessor.copyInputFileContents(inputFileName);
+            fileProcessor.closeFile();
+            System.out.println("All operations completed successfully.");
+        } else {
+            System.out.println("Input file cannot be read. Ensure the file exists and is accessible.");
         }
+
+        scanner.close();
     }
 }
