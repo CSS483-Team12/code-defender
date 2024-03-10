@@ -2,7 +2,7 @@
  * code-defender
  * @author Griffin Ryan (glryan@uw.edu)
  * @author Tony Le ()
- **/
+ **/    
 import java.util.Scanner;
 
 public class Main {
