@@ -1,18 +1,14 @@
-/**
- * code-defender
- * @author Griffin Ryan (glryan@uw.edu)
- * @author Tony Le ()
- **/    
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         InputHandler inputHandler = new InputHandler();
         PasswordManager passwordManager = new PasswordManager();
         FileProcessor fileProcessor = new FileProcessor();
 
-        System.out.println("Welcome to the Secure App!");
+        System.out.println("Welcome to code-defender, by Griffin Ryan and Tony Le!");
 
         // User input collection process
         String firstName = inputHandler.readValidName(scanner, "first name");
@@ -21,6 +17,9 @@ public class Main {
         int secondInt = inputHandler.readIntValue(scanner, "Enter the second integer: ");
         String inputFileName = inputHandler.readValidFileName(scanner, "input");
         String outputFileName = inputHandler.readValidFileName(scanner, "output");
+
+        // Important: Consume any newline left in the buffer to ensure scanner.nextLine() works as expected
+        scanner.nextLine(); // This line is crucial to avoid skipping the next input for password
 
         // Password setup and verification
         passwordManager.handlePasswordSetup(scanner);
@@ -42,6 +41,7 @@ public class Main {
             System.out.println("Input file cannot be read. Ensure the file exists and is accessible.");
         }
 
+        // Clean up
         scanner.close();
     }
 }
