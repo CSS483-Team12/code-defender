@@ -1,42 +1,57 @@
+/**
+ * code-defender
+ * @author Griffin Ryan (glryan@uw.edu)
+ * @author Tony Le ()
+ **/
 import java.io.*;
 
 public class FileProcessor {
+    private PrintWriter writer;
 
-    public void writeOutputFile(String fileName, String content) throws IOException {
-        try (FileWriter fw = new FileWriter(fileName);
-            BufferedWriter bw = new BufferedWriter(fw)) {
-            bw.write(content);
+    // Open a file for writing
+    public void openFile(String fileName) {
+        try {
+            writer = new PrintWriter(new FileWriter(fileName, true)); // Append mode
         } catch (IOException e) {
-            System.err.println("Error writing to output file: " + e.getMessage());
-            throw e; // Rethrow exception to handle it in the calling method or log it
+            System.err.println("An error occurred while opening the file: " + e.getMessage());
         }
     }
 
-    public String readInputFile(String fileName) throws IOException {
-        StringBuilder contentBuilder = new StringBuilder();
-        try (FileReader fr = new FileReader(fileName); BufferedReader br = new BufferedReader(fr)) {
+    // Write a single line to the file
+    public void writeLine(String line) {
+        if (writer != null) {
+            writer.println(line);
+        }
+    }
+
+    // Write calculation results
+    public void writeResults(int firstInt, int secondInt) {
+        writeLine("Sum: " + (firstInt + secondInt));
+        writeLine("Product: " + (firstInt * secondInt));
+    }
+
+    // Copy input file contents to the output file
+    public void copyInputFileContents(String inputFileName) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFileName))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                contentBuilder.append(line).append(System.lineSeparator());
+            while ((line = reader.readLine()) != null) {
+                writeLine(line);
             }
-        } catch (FileNotFoundException e) {
-            System.err.println("Input file not found: " + e.getMessage());
-            throw e;
         } catch (IOException e) {
-            System.err.println("Error reading input file: " + e.getMessage());
-            throw e;
+            System.err.println("An error occurred while reading the input file: " + e.getMessage());
         }
-        return contentBuilder.toString();
     }
 
-    public void storePassword(String fileName, String[] passwordAndSalt) throws IOException {
-        try (FileWriter fw = new FileWriter(fileName, true); // Append mode
-             BufferedWriter bw = new BufferedWriter(fw)) {
-            bw.write("Password Hash: " + passwordAndSalt[0] + " Salt: " + passwordAndSalt[1]);
-            bw.newLine();
-        } catch (IOException e) {
-            System.err.println("Error writing password to file: " + e.getMessage());
-            throw e; // Rethrow exception for external handling
+    // Close the file
+    public void closeFile() {
+        if (writer != null) {
+            writer.close();
         }
+    }
+
+    // Check if a file can be read
+    public boolean canReadFile(String fileName) {
+        File file = new File(fileName);
+        return file.exists() && file.canRead();
     }
 }
