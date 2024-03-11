@@ -26,21 +26,23 @@ public class Main {
 
         // Informing about the default input file and asking for the input file name
         System.out.println("A default 'input.txt' file is available for use. You may also specify another file.");
+        // Assuming inputFileName and inputFileExtension are already defined
         System.out.println("Enter the name of the input file you wish to use:");
         String inputFileName = scanner.nextLine();
         String inputFileExtension = getFileExtension(inputFileName);
 
-        // Ensuring the output file has the same extension as the input file
         String outputFileName;
+        File outputFile;
         do {
             System.out.println("Enter the name of the output file (must have the same extension '" + inputFileExtension + "'):");
             outputFileName = scanner.nextLine();
+            outputFile = new File(outputFileName);
             if (!outputFileName.endsWith(inputFileExtension)) {
                 System.out.println("The output file must have the same extension ('" + inputFileExtension + "') as the input file.");
-            } else if (new File(outputFileName).exists()) {
+            } else if (outputFile.exists()) {
                 System.out.println("This file already exists. Please enter a different file name.");
             }
-        } while (!outputFileName.endsWith(inputFileExtension) || new File(outputFileName).exists());
+        } while (!outputFileName.endsWith(inputFileExtension) || outputFile.exists());
 
         fileProcessor.copyFileToNewFile(inputFileName, outputFileName);
 
