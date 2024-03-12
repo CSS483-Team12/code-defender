@@ -4,77 +4,64 @@
  * @author Tony Le ()
  **/
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class FileProcessor {
     private PrintWriter writer;
 
-    /**
-     * Copies the content of an input file to a new output file.
-     * Assumes checks for file existence and extension validation are handled externally.
-     * @param inputFilePath the path to the source file.
-     * @param outputFilePath the path to the destination file.
-     */
-    public void copyFileToNewFile(String inputFilePath, String outputFilePath) {
-        File inputFile = new File(inputFilePath);
-        File outputFile = new File(outputFilePath);
+    public boolean isValidFileName(String fileNameBase) {
+        String regexPattern = "^[\\w-]+$";
+        return fileNameBase.matches(regexPattern);
+    }
+
+    public void copyFileToNewFile(String inputBaseFilePath, String outputBaseFilePath) {
+        if (!isValidFileName(inputBaseFilePath) || !isValidFileName(outputBaseFilePath)) {
+            System.err.println("Invalid file name. File names should only contain letters, numbers, underscores, or hyphens.");
+            return;
+        }
+
+        String inputFilePath = ensureTxtExtension(inputBaseFilePath);
+        String outputFilePath = ensureTxtExtension(outputBaseFilePath);
 
         try {
-            Files.copy(inputFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(Paths.get(inputFilePath), Paths.get(outputFilePath), StandardCopyOption.REPLACE_EXISTING);
             System.out.println("File has been successfully copied to " + outputFilePath);
         } catch (IOException e) {
             System.err.println("An error occurred while copying the file: " + e.getMessage());
         }
     }
 
-    // Open a file for writing
-    public void openFile(String fileName) {
+    private String ensureTxtExtension(String fileName) {
+        return fileName.replaceAll("\\.txt$", "") + ".txt";
+    }
+
+    // Adding method to save content from input file to output file
+    public void saveInputToFile(String inputBaseFilePath, String outputBaseFilePath) {
+        if (!isValidFileName(inputBaseFilePath) || !isValidFileName(outputBaseFilePath)) {
+            System.err.println("Invalid file name. Please ensure the file names contain only letters, numbers, underscores, or hyphens.");
+            return;
+        }
+
+        String inputFilePath = ensureTxtExtension(inputBaseFilePath);
+        String outputFilePath = ensureTxtExtension(outputBaseFilePath);
+
         try {
-            writer = new PrintWriter(new FileWriter(fileName, true)); // Append mode
-        } catch (IOException e) {
-            System.err.println("An error occurred while opening the file: " + e.getMessage());
-        }
-    }
-
-    // Write a single line to the file
-    public void writeLine(String line) {
-        if (writer != null) {
-            writer.println(line);
-        }
-    }
-
-    // Write calculation results
-    public void writeResults(int firstInt, int secondInt) {
-        writeLine("Sum: " + (firstInt + secondInt));
-        writeLine("Product: " + (firstInt * secondInt));
-    }
-
-    // Copy input file contents to the output file
-    public void copyInputFileContents(String inputFileName) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFileName))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                writeLine(line);
+            // Ensuring the input file exists
+            File inputFile = new File(inputFilePath);
+            if (!inputFile.exists()) {
+                System.err.println("The input file does not exist: " + inputFilePath);
+                return;
             }
+
+            // Reading content from the input file and writing it to the output file
+            Files.copy(Paths.get(inputFilePath), Paths.get(outputFilePath), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Content from " + inputFilePath + " has been successfully saved to " + outputFilePath);
         } catch (IOException e) {
-            System.err.println("An error occurred while reading the input file: " + e.getMessage());
+            System.err.println("An error occurred while saving content to the file: " + e.getMessage());
         }
     }
 
-    // Close the file
-    public void closeFile() {
-        if (writer != null) {
-            writer.close();
-        }
-    }
-
-    // Check if a file can be read
-    public boolean canReadFile(String fileName) {
-        File file = new File(fileName);
-        return file.exists() && file.canRead();
-    }
+    // Other methods as needed...
 }
