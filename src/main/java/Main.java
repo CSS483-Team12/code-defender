@@ -26,12 +26,13 @@ public class Main {
         int firstInt = inputHandler.readIntValue(scanner, "Enter the first integer: ");
         System.out.println("Enter the second integer (range -2,147,483,648 to 2,147,483,647):");
         int secondInt = inputHandler.readIntValue(scanner, "Enter the second integer: ");
+        scanner.nextLine(); // consuming the lingering new line character.
 
-        // Input file name validation and existence check
+        // Now when prompting for the file name, the input should be properly awaited
         String inputFileName;
         do {
             System.out.println("Enter the input file name (without specifying '.txt'):");
-            inputFileName = scanner.nextLine();
+            inputFileName = scanner.nextLine().trim();
             if (!fileProcessor.isValidFileName(inputFileName)) {
                 System.out.println("Invalid file name. Please enter a valid name (alphanumeric, underscores, hyphens):");
                 continue;
@@ -40,29 +41,36 @@ public class Main {
             File inputFile = new File(inputFileName);
             if (!inputFile.exists()) {
                 System.out.println("The input file does not exist: " + inputFileName + ". Please enter a different file name.");
-                inputFileName = null; // Reset to null to trigger reprompt
+                inputFileName = null; // Reset to null to trigger re-prompt
             }
         } while (inputFileName == null);
 
-        // Output file name validation and existence check
         String outputFileName;
         do {
-            System.out.println("Enter the output file name (without specifying '.txt'):");
-            outputFileName = scanner.nextLine();
-            if (!fileProcessor.isValidFileName(outputFileName)) {
-                System.out.println("Invalid file name. Please enter a valid name (alphanumeric, underscores, hyphens):");
-                continue;
-            }
-            outputFileName += ".txt"; // Append .txt extension for processing
-            File outputFile = new File(outputFileName);
-            if (outputFile.exists()) {
-                System.out.println("The output file already exists. Please choose a different file name.");
-                outputFileName = null; // Reset for reprompting
+            System.out.println("Enter the output file name (without specifying '.txt'), ensuring it does not already exist: ");
+            outputFileName = scanner.nextLine().trim();
+
+            // Check if the file name is valid and the file does not exist
+            if (fileProcessor.isValidFileName(outputFileName)) {
+                outputFileName += ".txt"; // Append .txt for the actual file name check
+                File outputFile = new File(outputFileName);
+
+                if (outputFile.exists()) {
+                    System.out.println("The file '" + outputFileName + "' already exists. Please enter a different name.");
+                    outputFileName = null; // Reset for the condition to re-prompt
+                } else {
+                    // Valid and does not exist, break the loop
+                    break;
+                }
+            } else {
+                System.out.println("Invalid file name. File names should only contain letters, numbers, underscores, or hyphens. Please try again: ");
+                outputFileName = null; // Ensure the loop continues due to invalid format
             }
         } while (outputFileName == null);
 
-        // Save input file content to output file
-        fileProcessor.saveInputToFile(inputFileName, outputFileName);
+        // Proceed with saving the input file content to the output file
+        fileProcessor.saveInputToFile(inputFileName, outputFileName); // Use the validated and checked file name here
+
 
         // Password setup and verification
         passwordManager.handlePasswordSetup(scanner);
