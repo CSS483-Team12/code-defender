@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 public class PasswordManager {
 
-    private static final String PASSWORD_FILE = "passwords.txt";
+    private static final String PASSWORD_FILE = "passwords.bin"; // Update to use .bin
 
     // Generate a salt
     private byte[] generateSalt() {
